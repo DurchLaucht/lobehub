@@ -19,6 +19,44 @@ const formatPrice = (price?: string) => {
   return Number((Number(price) * 1e6).toPrecision(5));
 };
 
+const buildImageVideoPricing = (pricing?: ModelPricing, pricingSkus?: Record<string, string>) => {
+  const units: { name: string; rate: number; strategy: 'fixed'; unit: string }[] = [];
+
+  // Prefer explicit ModelPricing (prompt/completion/image) if present
+  if (pricing) {
+    const imageRate = formatPrice(pricing.image);
+    if (typeof imageRate === 'number') {
+      units.push({ name: 'imageGeneration', rate: imageRate, strategy: 'fixed', unit: 'image' });
+    }
+    const promptRate = formatPrice(pricing.prompt);
+    if (typeof promptRate === 'number' && promptRate > 0) {
+      units.push({ name: 'textInput', rate: promptRate, strategy: 'fixed', unit: 'millionTokens' });
+    }
+    const completionRate = formatPrice(pricing.completion);
+    if (typeof completionRate === 'number' && completionRate > 0) {
+      units.push({ name: 'textOutput', rate: completionRate, strategy: 'fixed', unit: 'millionTokens' });
+    }
+  }
+
+  // Fallback to pricing_skus (e.g. { image: "0.05", video: "0.75" })
+  if (units.length === 0 && pricingSkus) {
+    for (const [key, value] of Object.entries(pricingSkus)) {
+      const rate = formatPrice(value);
+      if (typeof rate !== 'number' || rate <= 0) continue;
+      const lower = key.toLowerCase();
+      if (lower.includes('image')) {
+        units.push({ name: 'imageGeneration', rate, strategy: 'fixed', unit: 'image' });
+      } else if (lower.includes('video')) {
+        units.push({ name: 'videoGeneration', rate, strategy: 'fixed', unit: 'video' });
+      } else if (lower.includes('request')) {
+        units.push({ name: 'imageGeneration', rate, strategy: 'fixed', unit: 'image' });
+      }
+    }
+  }
+
+  return units.length > 0 ? { currency: 'USD' as const, units } : undefined;
+};
+
 const imageParameterNames = {
   aspect_ratio: 'aspectRatio',
   quality: 'quality',
@@ -396,24 +434,32 @@ export const params = {
         };
       });
 
-    const formattedImageModels = imageModels.map((model) => ({
-      description: model.description,
-      displayName: model.name || model.id,
-      id: model.id,
-      imageOutput: true,
-      parameters: createImageModelParameters(model),
-      type: 'image' as const,
-      vision: model.architecture.input_modalities.includes('image'),
-    }));
+    const formattedImageModels = imageModels.map((model) => {
+      const pricing = buildImageVideoPricing((model as any).pricing, (model as any).pricing_skus);
+      return {
+        description: model.description,
+        displayName: model.name || model.id,
+        id: model.id,
+        imageOutput: true,
+        parameters: createImageModelParameters(model),
+        ...(pricing ? { pricing } : {}),
+        type: 'image' as const,
+        vision: model.architecture.input_modalities.includes('image'),
+      };
+    });
 
-    const formattedVideoModels = videoModels.map((model) => ({
-      description: model.description,
-      displayName: model.name || model.id,
-      id: model.id,
-      parameters: createVideoModelParameters(model),
-      type: 'video' as const,
-      video: true,
-    }));
+    const formattedVideoModels = videoModels.map((model) => {
+      const pricing = buildImageVideoPricing((model as any).pricing, (model as any).pricing_skus);
+      return {
+        description: model.description,
+        displayName: model.name || model.id,
+        id: model.id,
+        parameters: createVideoModelParameters(model),
+        ...(pricing ? { pricing } : {}),
+        type: 'video' as const,
+        video: true,
+      };
+    });
 
     const formattedEmbeddingModels = embeddingModels.map((model) => ({
       description: model.description,

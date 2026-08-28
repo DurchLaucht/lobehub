@@ -387,6 +387,7 @@ export default {
   'providerModels.item.modelConfig.vision.title': 'Support Vision',
   'providerModels.item.pricing.image': '${{amount}}/Image',
   'providerModels.item.pricing.inputCharts': '${{amount}}/M Characters',
+  'providerModels.item.pricing.video': '${{amount}}/Video',
   'providerModels.item.pricing.inputMinutes': '${{amount}}/Minutes',
   'providerModels.item.pricing.inputTokens': 'Input ${{amount}}/M',
   'providerModels.item.pricing.outputTokens': 'Output ${{amount}}/M',

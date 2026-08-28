@@ -299,6 +299,7 @@
   "providerModels.item.modelConfig.vision.extra": "此配置将仅开启应用中的图片上传配置，是否支持识别完全取决于模型本身，请自行测试该模型的视觉识别能力可用性",
   "providerModels.item.modelConfig.vision.title": "支持视觉识别",
   "providerModels.item.pricing.image": "${{amount}}/图片",
+  "providerModels.item.pricing.video": "${{amount}}/视频",
   "providerModels.item.pricing.inputCharts": "${{amount}}/M 字符",
   "providerModels.item.pricing.inputMinutes": "${{amount}}/分钟",
   "providerModels.item.pricing.inputTokens": "输入 ${{amount}}/M",

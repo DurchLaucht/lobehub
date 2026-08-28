@@ -124,3 +124,17 @@ export function getWriteCacheInputUnitRate(pricing?: Pricing): number | undefine
 export function getCachedAudioInputUnitRate(pricing?: Pricing): number | undefined {
   return getUnitRateByName(pricing, 'audioInput_cacheRead');
 }
+
+/**
+ * Get image generation unit rate from pricing
+ */
+export function getImageGenerationUnitRate(pricing?: Pricing): number | undefined {
+  return getUnitRateByName(pricing, 'imageGeneration');
+}
+
+/**
+ * Get video generation unit rate from pricing
+ */
+export function getVideoGenerationUnitRate(pricing?: Pricing): number | undefined {
+  return getUnitRateByName(pricing, 'videoGeneration');
+}
