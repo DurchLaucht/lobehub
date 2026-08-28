@@ -330,6 +330,7 @@ export interface OpenAICompatibleFactoryOptions<T extends Record<string, any> = 
       payload: ResponseCreateParamsWithPromptCacheKey;
     };
   };
+  transcribe?: (payload: ASRPayload, options: ASROptions) => Promise<ASRResponse>;
 }
 
 export const createOpenAICompatibleRuntime = <T extends Record<string, any> = any>({
@@ -349,6 +350,7 @@ export const createOpenAICompatibleRuntime = <T extends Record<string, any> = an
   handleCreateVideoWebhook: customHandleCreateVideoWebhook,
   handlePollVideoStatus: customHandlePollVideoStatus,
   generateObject: generateObjectConfig,
+  transcribe: customTranscribe,
 }: OpenAICompatibleFactoryOptions<T>) => {
   const ErrorType = {
     bizError: errorType?.bizError || AgentRuntimeErrorType.ProviderBizError,
@@ -1343,6 +1345,10 @@ export const createOpenAICompatibleRuntime = <T extends Record<string, any> = an
     }
 
     async transcribe(payload: ASRPayload, options?: ASROptions): Promise<ASRResponse> {
+      if (customTranscribe) {
+        return customTranscribe(payload, options as any);
+      }
+
       const log = debug(`${this.logPrefix}:transcribe`);
       const { file, fileName, model, language, prompt, responseFormat, temperature } = payload;
       const requestModel = withMappedModelId(payload, this.modelIdMappingOptions).model;

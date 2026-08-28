@@ -44,4 +44,14 @@ export interface ASRResponse {
    * The transcribed text.
    */
   text: string;
+  /**
+   * Optional usage / cost metadata returned by the provider.
+   */
+  usage?: {
+    cost?: number;
+    inputTokens?: number;
+    outputTokens?: number;
+    seconds?: number;
+    totalTokens?: number;
+  };
 }

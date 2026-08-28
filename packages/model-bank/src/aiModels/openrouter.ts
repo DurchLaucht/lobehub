@@ -1,4 +1,5 @@
-import type { AIChatModelCard } from '../types/aiModel';
+import { gptImage2Schema } from '../const/imageParameters';
+import type { AIChatModelCard, AIImageModelCard, AIVideoModelCard } from '../types/aiModel';
 
 // https://openrouter.ai/docs/api-reference/list-available-models
 const openrouterChatModels: AIChatModelCard[] = [
@@ -848,6 +849,73 @@ const openrouterChatModels: AIChatModelCard[] = [
   },
 ];
 
-export const allModels = [...openrouterChatModels];
+const openrouterImageModels: AIImageModelCard[] = [
+  {
+    description:
+      "OpenRouter's dedicated image generation model with text-to-image and editing support.",
+    displayName: 'GPT Image 2',
+    enabled: true,
+    id: 'openai/gpt-image-2',
+    parameters: gptImage2Schema,
+    type: 'image',
+  },
+  {
+    description: 'Seedream 4.5 image generation model available through OpenRouter.',
+    displayName: 'Seedream 4.5',
+    enabled: true,
+    id: 'bytedance-seed/seedream-4.5',
+    parameters: {
+      imageUrls: { default: [] },
+      prompt: { default: '' },
+      resolution: { default: '1K', enum: ['1K', '2K', '4K'] },
+    },
+    type: 'image',
+  },
+];
+
+const openrouterVideoModels: AIVideoModelCard[] = [
+  {
+    description: 'Google Veo 3.1 video generation model available through OpenRouter.',
+    displayName: 'Veo 3.1',
+    enabled: true,
+    id: 'google/veo-3.1',
+    parameters: {
+      aspectRatio: { default: '16:9', enum: ['16:9', '9:16', '1:1'] },
+      duration: { default: 8, min: 1, max: 60 },
+      endImageUrl: { default: null, requiresImageUrl: true },
+      generateAudio: { default: true },
+      imageUrl: { default: null },
+      imageUrls: { default: [] },
+      prompt: { default: '' },
+      resolution: { default: '720p', enum: ['720p', '1080p'] },
+      seed: { default: null },
+    },
+    type: 'video',
+  },
+  {
+    description: 'Hailuo 3 video generation model available through OpenRouter.',
+    displayName: 'Hailuo 3',
+    enabled: true,
+    id: 'minimax/hailuo-3',
+    parameters: {
+      aspectRatio: { default: '16:9', enum: ['16:9'] },
+      duration: { default: 5, min: 1, max: 60 },
+      endImageUrl: { default: null, requiresImageUrl: true },
+      generateAudio: { default: true },
+      imageUrl: { default: null },
+      imageUrls: { default: [] },
+      prompt: { default: '' },
+      resolution: { default: '2K', enum: ['2K'] },
+      seed: { default: null },
+    },
+    type: 'video',
+  },
+];
+
+export const allModels = [
+  ...openrouterChatModels,
+  ...openrouterImageModels,
+  ...openrouterVideoModels,
+];
 
 export default allModels;

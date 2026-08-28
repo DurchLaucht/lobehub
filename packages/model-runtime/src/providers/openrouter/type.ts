@@ -39,6 +39,51 @@ export interface OpenRouterModelCard {
   top_provider: TopProvider;
 }
 
+export interface OpenRouterImageParameterDescriptor {
+  max?: number;
+  min?: number;
+  type: 'boolean' | 'enum' | 'range';
+  values?: string[];
+}
+
+export interface OpenRouterImageModelCard {
+  architecture: {
+    input_modalities: string[];
+    output_modalities: string[];
+  };
+  created?: number;
+  description?: string;
+  id: string;
+  name?: string;
+  supported_parameters?: Record<string, OpenRouterImageParameterDescriptor>;
+}
+
+export interface OpenRouterVideoModelCard {
+  allowed_passthrough_parameters?: string[];
+  canonical_slug?: string;
+  created?: number;
+  description?: string;
+  id: string;
+  name?: string;
+  pricing_skus?: Record<string, string>;
+  supported_aspect_ratios?: string[];
+  supported_resolutions?: string[];
+  supported_sizes?: string[];
+}
+
+export interface OpenRouterTranscriptionUsage {
+  cost?: number;
+  input_tokens?: number;
+  output_tokens?: number;
+  seconds?: number;
+  total_tokens?: number;
+}
+
+export interface OpenRouterTranscriptionResponse {
+  text: string;
+  usage?: OpenRouterTranscriptionUsage;
+}
+
 export interface OpenRouterReasoning {
   effort?: 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh' | 'max';
   enabled?: boolean;

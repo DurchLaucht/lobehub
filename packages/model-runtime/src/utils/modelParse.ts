@@ -559,8 +559,12 @@ const processModelCard = (
         ? 'embedding'
         : 'chat');
 
-  // image model can't find parameters
-  if (modelType === 'image' && !model.parameters && !knownModel?.parameters) {
+  // Image and video models need parameter metadata to be usable by the generation UI.
+  if (
+    (modelType === 'image' || modelType === 'video') &&
+    !model.parameters &&
+    !knownModel?.parameters
+  ) {
     return undefined;
   }
 
@@ -651,10 +655,11 @@ const processModelCard = (
       knownModel?.abilities?.search ??
       ((isKeywordListMatch(model.id.toLowerCase(), searchKeywords) && !isExcludedModel) || false),
     type: modelType,
-    // current, only image model use the parameters field
-    ...(modelType === 'image' && {
-      parameters: model.parameters ?? knownModel?.parameters,
-    }),
+    ...(modelType === 'image' || modelType === 'video'
+      ? {
+          parameters: model.parameters ?? knownModel?.parameters,
+        }
+      : {}),
     ...(mergedSettings ? { settings: mergedSettings } : {}),
     video:
       model.video ??

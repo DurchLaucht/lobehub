@@ -631,6 +631,94 @@ describe('LobeOpenRouterAI - custom features', () => {
       expect(models.length).toBeGreaterThan(0);
     });
 
+    it('should expose image models with their discovered parameters', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn((url: string) => {
+          if (url.endsWith('/images/models')) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => ({
+                data: [
+                  {
+                    architecture: {
+                      input_modalities: ['text', 'image'],
+                      output_modalities: ['image'],
+                    },
+                    description: 'An image model',
+                    id: 'openai/gpt-image-2',
+                    name: 'GPT Image 2',
+                    supported_parameters: {
+                      aspect_ratio: { type: 'enum', values: ['1:1', '16:9'] },
+                      size: { type: 'enum', values: ['1024x1024', '1536x1024'] },
+                    },
+                  },
+                ],
+              }),
+            });
+          }
+
+          return Promise.resolve({ ok: true, json: async () => ({ data: [] }) });
+        }),
+      );
+
+      const models = await params.models();
+      const imageModel = models.find((model) => model.id === 'openai/gpt-image-2');
+
+      expect(imageModel).toMatchObject({
+        imageOutput: true,
+        parameters: {
+          aspectRatio: { default: '1:1', enum: ['1:1', '16:9'] },
+          imageUrls: { default: [] },
+          prompt: { default: '' },
+          size: { default: '1024x1024', enum: ['1024x1024', '1536x1024'] },
+        },
+        type: 'image',
+        vision: true,
+      });
+    });
+
+    it('should expose video models with their discovered parameters', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn((url: string) => {
+          if (url.endsWith('/videos/models')) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => ({
+                data: [
+                  {
+                    description: 'A video model',
+                    id: 'google/veo-3.1',
+                    name: 'Google: Veo 3.1',
+                    supported_aspect_ratios: ['16:9', '9:16'],
+                    supported_resolutions: ['720p', '1080p'],
+                  },
+                ],
+              }),
+            });
+          }
+
+          return Promise.resolve({ ok: true, json: async () => ({ data: [] }) });
+        }),
+      );
+
+      const models = await params.models();
+      const videoModel = models.find((model) => model.id === 'google/veo-3.1');
+
+      expect(videoModel).toMatchObject({
+        parameters: {
+          aspectRatio: { default: '16:9', enum: ['16:9', '9:16'] },
+          duration: { default: 5, max: 60, min: 1 },
+          generateAudio: { default: true },
+          prompt: { default: '' },
+          resolution: { default: '720p', enum: ['720p', '1080p'] },
+        },
+        type: 'video',
+        video: true,
+      });
+    });
+
     it('should handle display name with colon - remove prefix', async () => {
       const mockModels = [
         {
