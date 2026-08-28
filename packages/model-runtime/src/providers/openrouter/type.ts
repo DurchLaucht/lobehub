@@ -55,8 +55,6 @@ export interface OpenRouterImageModelCard {
   description?: string;
   id: string;
   name?: string;
-  pricing?: ModelPricing;
-  pricing_skus?: Record<string, string>;
   supported_parameters?: Record<string, OpenRouterImageParameterDescriptor>;
 }
 
@@ -67,7 +65,6 @@ export interface OpenRouterVideoModelCard {
   description?: string;
   id: string;
   name?: string;
-  pricing?: ModelPricing;
   pricing_skus?: Record<string, string>;
   supported_aspect_ratios?: string[];
   supported_resolutions?: string[];

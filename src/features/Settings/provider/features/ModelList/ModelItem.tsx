@@ -16,10 +16,8 @@ import { aiModelSelectors, useAiInfraStore } from '@/store/aiInfra';
 import { formatPriceByCurrency } from '@/utils/format';
 import {
   getAudioInputUnitRate,
-  getImageGenerationUnitRate,
   getTextInputUnitRate,
   getTextOutputUnitRate,
-  getVideoGenerationUnitRate,
 } from '@/utils/pricing';
 
 import { createModelConfigModal } from './ModelConfigModal';
@@ -143,40 +141,7 @@ const ModelItem = memo<ModelItemProps>(
         }
 
         case 'image': {
-          const imageRate = getImageGenerationUnitRate(pricing);
-          if (typeof imageRate === 'number') {
-            return [
-              t('providerModels.item.pricing.image', {
-                amount: formatPriceByCurrency(imageRate, pricing?.currency),
-              }),
-            ];
-          }
-          // Fallback to text input rate if imageGeneration not present
-          const inputRate = getTextInputUnitRate(pricing);
-          return [
-            typeof inputRate === 'number' &&
-              t('providerModels.item.pricing.inputTokens', {
-                amount: formatPriceByCurrency(inputRate, pricing?.currency),
-              }),
-          ].filter(Boolean) as string[];
-        }
-
-        case 'video': {
-          const videoRate = getVideoGenerationUnitRate(pricing);
-          if (typeof videoRate === 'number') {
-            return [
-              t('providerModels.item.pricing.video', {
-                amount: formatPriceByCurrency(videoRate, pricing?.currency),
-              }),
-            ];
-          }
-          const inputRate = getTextInputUnitRate(pricing);
-          return [
-            typeof inputRate === 'number' &&
-              t('providerModels.item.pricing.inputTokens', {
-                amount: formatPriceByCurrency(inputRate, pricing?.currency),
-              }),
-          ].filter(Boolean) as string[];
+          return [];
         }
 
         default: {

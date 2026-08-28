@@ -857,9 +857,6 @@ const openrouterImageModels: AIImageModelCard[] = [
     enabled: true,
     id: 'openai/gpt-image-2',
     parameters: gptImage2Schema,
-    pricing: {
-      units: [{ name: 'imageGeneration', rate: 0.05, strategy: 'fixed', unit: 'image' }],
-    },
     type: 'image',
   },
   {
@@ -871,9 +868,6 @@ const openrouterImageModels: AIImageModelCard[] = [
       imageUrls: { default: [] },
       prompt: { default: '' },
       resolution: { default: '1K', enum: ['1K', '2K', '4K'] },
-    },
-    pricing: {
-      units: [{ name: 'imageGeneration', rate: 0.08, strategy: 'fixed', unit: 'image' }],
     },
     type: 'image',
   },
@@ -896,9 +890,6 @@ const openrouterVideoModels: AIVideoModelCard[] = [
       resolution: { default: '720p', enum: ['720p', '1080p'] },
       seed: { default: null },
     },
-    pricing: {
-      units: [{ name: 'videoGeneration', rate: 0.5, strategy: 'fixed', unit: 'video' }],
-    },
     type: 'video',
   },
   {
@@ -916,9 +907,6 @@ const openrouterVideoModels: AIVideoModelCard[] = [
       prompt: { default: '' },
       resolution: { default: '2K', enum: ['2K'] },
       seed: { default: null },
-    },
-    pricing: {
-      units: [{ name: 'videoGeneration', rate: 0.4, strategy: 'fixed', unit: 'video' }],
     },
     type: 'video',
   },
