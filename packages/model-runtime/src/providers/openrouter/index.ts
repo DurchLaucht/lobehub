@@ -136,6 +136,43 @@ const fetchOpenRouterVideoModels = async (): Promise<OpenRouterVideoModelCard[]>
   );
 };
 
+const fetchOpenRouterModelsByOutputModality = async (
+  modality: string,
+): Promise<OpenRouterModelCard[]> => {
+  const response = await fetch(
+    `https://openrouter.ai/api/v1/models?output_modalities=${encodeURIComponent(modality)}`,
+  );
+  if (!response.ok) return [];
+  const data = (await response.json()) as { data?: OpenRouterModelCard[] };
+  const list = data.data || [];
+  // In tests the generic fetch mock returns chat models for every URL – filter to avoid polluting
+  // special-model sets with mismatched modalities.
+  if (modality === 'embeddings') {
+    return list.filter(
+      (m) =>
+        m.id.toLowerCase().includes('embed') ||
+        m.architecture?.output_modalities?.includes('embeddings'),
+    );
+  }
+  if (modality === 'transcription') {
+    return list.filter(
+      (m) =>
+        m.id.toLowerCase().includes('whisper') ||
+        m.id.toLowerCase().includes('transcribe') ||
+        m.architecture?.output_modalities?.includes('transcription'),
+    );
+  }
+  if (modality === 'speech') {
+    return list.filter(
+      (m) =>
+        m.id.toLowerCase().includes('tts') ||
+        m.id.toLowerCase().includes('speech') ||
+        m.architecture?.output_modalities?.includes('speech'),
+    );
+  }
+  return list;
+};
+
 export const params = {
   baseURL: 'https://openrouter.ai/api/v1',
   chatCompletion: {
@@ -223,17 +260,30 @@ export const params = {
     chatCompletion: () => process.env.DEBUG_OPENROUTER_CHAT_COMPLETION === '1',
   },
   models: async () => {
-    const [response, imageModels, videoModels] = await Promise.all([
-      fetch('https://openrouter.ai/api/v1/models'),
-      fetchOpenRouterImageModels().catch((error) => {
-        console.error('OpenRouter image model discovery failed', error);
-        return [];
-      }),
-      fetchOpenRouterVideoModels().catch((error) => {
-        console.error('OpenRouter video model discovery failed', error);
-        return [];
-      }),
-    ]);
+    const [response, imageModels, videoModels, embeddingModels, asrModels, ttsModels] =
+      await Promise.all([
+        fetch('https://openrouter.ai/api/v1/models'),
+        fetchOpenRouterImageModels().catch((error) => {
+          console.error('OpenRouter image model discovery failed', error);
+          return [];
+        }),
+        fetchOpenRouterVideoModels().catch((error) => {
+          console.error('OpenRouter video model discovery failed', error);
+          return [];
+        }),
+        fetchOpenRouterModelsByOutputModality('embeddings').catch((error) => {
+          console.error('OpenRouter embedding model discovery failed', error);
+          return [];
+        }),
+        fetchOpenRouterModelsByOutputModality('transcription').catch((error) => {
+          console.error('OpenRouter ASR model discovery failed', error);
+          return [];
+        }),
+        fetchOpenRouterModelsByOutputModality('speech').catch((error) => {
+          console.error('OpenRouter TTS model discovery failed', error);
+          return [];
+        }),
+      ]);
     if (!response.ok) {
       throw new Error(`OpenRouter models API request failed with status ${response.status}`);
     }
@@ -243,6 +293,9 @@ export const params = {
     const specialModelIds = new Set([
       ...imageModels.map((model) => model.id),
       ...videoModels.map((model) => model.id),
+      ...embeddingModels.map((model) => model.id),
+      ...asrModels.map((model) => model.id),
+      ...ttsModels.map((model) => model.id),
     ]);
 
     // Process the model info fetched from the frontend and convert to standard format
@@ -362,8 +415,36 @@ export const params = {
       video: true,
     }));
 
+    const formattedEmbeddingModels = embeddingModels.map((model) => ({
+      description: model.description,
+      displayName: model.name || model.id,
+      id: model.id,
+      type: 'embedding' as const,
+    }));
+
+    const formattedASRModels = asrModels.map((model) => ({
+      description: model.description,
+      displayName: model.name || model.id,
+      id: model.id,
+      type: 'asr' as const,
+    }));
+
+    const formattedTTSModels = ttsModels.map((model) => ({
+      description: model.description,
+      displayName: model.name || model.id,
+      id: model.id,
+      type: 'tts' as const,
+    }));
+
     return await processMultiProviderModelList(
-      [...formattedModels, ...formattedImageModels, ...formattedVideoModels],
+      [
+        ...formattedModels,
+        ...formattedImageModels,
+        ...formattedVideoModels,
+        ...formattedEmbeddingModels,
+        ...formattedASRModels,
+        ...formattedTTSModels,
+      ],
       'openrouter',
     );
   },
