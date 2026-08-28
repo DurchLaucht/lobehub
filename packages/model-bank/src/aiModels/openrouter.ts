@@ -10,6 +10,89 @@ const openrouterChatModels: AIChatModelCard[] = [
     displayName: 'Auto (best for prompt)',
     enabled: true,
     id: 'openrouter/auto',
+    pricing: {
+      units: [
+        { name: 'textInput', rate: 0.2, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textOutput', rate: 0.8, strategy: 'fixed', unit: 'millionTokens' },
+      ],
+    },
+    type: 'chat',
+  },
+  // Added for stats $ display – models seen in usage as openai/gpt-5.6-luna via OpenRouter
+  {
+    abilities: { functionCall: true, reasoning: true, search: true, vision: true },
+    contextWindowTokens: 400_000,
+    description: 'GPT-5.6 Luna via OpenRouter – cost-efficient GPT-5.6 for high-volume tasks.',
+    displayName: 'GPT-5.6 Luna (OpenRouter)',
+    family: 'gpt',
+    generation: 'gpt-5.6',
+    id: 'openai/gpt-5.6-luna',
+    pricing: {
+      units: [
+        { name: 'textInput', rate: 0.2, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textOutput', rate: 1.2, strategy: 'fixed', unit: 'millionTokens' },
+      ],
+    },
+    type: 'chat',
+  },
+  {
+    abilities: { functionCall: true, reasoning: true, search: true, vision: true },
+    contextWindowTokens: 400_000,
+    description: 'GPT-5.6 Sol via OpenRouter – flagship GPT-5.6 for coding and agentic work.',
+    displayName: 'GPT-5.6 Sol (OpenRouter)',
+    family: 'gpt',
+    generation: 'gpt-5.6',
+    id: 'openai/gpt-5.6-sol',
+    pricing: {
+      units: [
+        { name: 'textInput', rate: 5, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textOutput', rate: 30, strategy: 'fixed', unit: 'millionTokens' },
+      ],
+    },
+    type: 'chat',
+  },
+  {
+    abilities: { functionCall: true, reasoning: true, search: true, vision: true },
+    contextWindowTokens: 400_000,
+    description: 'GPT-5.6 Terra via OpenRouter – balanced GPT-5.6.',
+    displayName: 'GPT-5.6 Terra (OpenRouter)',
+    family: 'gpt',
+    generation: 'gpt-5.6',
+    id: 'openai/gpt-5.6-terra',
+    pricing: {
+      units: [
+        { name: 'textInput', rate: 2, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textOutput', rate: 12, strategy: 'fixed', unit: 'millionTokens' },
+      ],
+    },
+    type: 'chat',
+  },
+  // DeepSeek V4 Flash via OpenRouter (seen as deepseek-v4-flash in stats)
+  {
+    abilities: { functionCall: true, reasoning: true, vision: true },
+    contextWindowTokens: 131_072,
+    description: 'DeepSeek V4 Flash via OpenRouter – fast DeepSeek variant.',
+    displayName: 'DeepSeek V4 Flash',
+    family: 'deepseek',
+    generation: 'deepseek-v4',
+    id: 'deepseek/deepseek-v4-flash',
+    pricing: {
+      units: [
+        { name: 'textInput', rate: 0.27, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textOutput', rate: 1.1, strategy: 'fixed', unit: 'millionTokens' },
+      ],
+    },
+    type: 'chat',
+  },
+  {
+    displayName: 'DeepSeek V4 Flash (short id)',
+    id: 'deepseek-v4-flash',
+    pricing: {
+      units: [
+        { name: 'textInput', rate: 0.27, strategy: 'fixed', unit: 'millionTokens' },
+        { name: 'textOutput', rate: 1.1, strategy: 'fixed', unit: 'millionTokens' },
+      ],
+    },
     type: 'chat',
   },
   {
