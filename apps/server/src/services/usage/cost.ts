@@ -24,7 +24,18 @@ const lookupPricing = (provider?: string | null, model?: string | null): Pricing
   if (provider && pricingByKey.has(`${provider}/${model}`)) {
     return pricingByKey.get(`${provider}/${model}`);
   }
-  return pricingByKey.get(model);
+  if (pricingByKey.has(model)) return pricingByKey.get(model);
+  // OpenRouter IDs are often `openai/gpt-5.6-luna` while model-bank stores bare `gpt-5.6-luna`
+  if (model.includes('/')) {
+    const bare = model.split('/').pop()!;
+    if (pricingByKey.has(bare)) return pricingByKey.get(bare);
+    // Also try provider/bare (e.g. openai/gpt-5.6-luna -> openai/bare)
+    const modelProvider = model.split('/')[0];
+    if (modelProvider && pricingByKey.has(`${modelProvider}/${bare}`)) {
+      return pricingByKey.get(`${modelProvider}/${bare}`);
+    }
+  }
+  return undefined;
 };
 
 // Pricing rates live in the model's currency (per million tokens). Normalize to
